@@ -1511,7 +1511,7 @@ void go_home()
     }
 
     #ifndef Z_SAFE_HOMING
-    #error remove this line if you meant to do this
+ //   #error remove this line if you meant to do this
           if((home_all_axis) || (code_seen(axis_codes[Z_AXIS]))) {
             #if defined (Z_RAISE_BEFORE_HOMING) && (Z_RAISE_BEFORE_HOMING > 0)
               destination[Z_AXIS] = Z_RAISE_BEFORE_HOMING * home_dir(Z_AXIS) * (-1);    // Set destination away from bed

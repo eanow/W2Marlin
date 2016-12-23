@@ -37,16 +37,16 @@ Here are some standard links for getting your machine calibrated:
 // @section info
 //#define WILSON_TYPE           // comment this out if not wilson
 #define WILSON_II_TYPE        // comment this out if not wilson ii
-#define MY_BEDLEVELING_DEFAULTS // comment this out to strip out all the bed leveling stuff
+//#define MY_BEDLEVELING_DEFAULTS // comment this out to strip out all the bed leveling stuff
 
-#define MJRICE_BEDLEVELING_RACK // include this (only) if using the rack-and-pinion aparatus for bed probing / leveling
-
+//#define MJRICE_BEDLEVELING_RACK // include this (only) if using the rack-and-pinion aparatus for bed probing / leveling
+#define ENABLE_AUTO_BED_LEVELING // Delete the comment to enable (remove // at the start of the line)
 #ifdef MY_BEDLEVELING_DEFAULTS
  #define ENABLE_AUTO_BED_LEVELING // Delete the comment to enable (remove // at the start of the line)
  #define MANUAL_BED_LEVELING  // Add display menu option for bed leveling
  #ifndef MJRICE_BEDLEVELING_RACK // this does not use servos
   #define NUM_SERVOS 3 // Servo index starts with 0 for M280 command
-  #define SERVO_ENDSTOPS {-1, -1, 0} // Servo index for X, Y, Z. Disable with -1
+  #define SERVO_ENDSTOPS {-1, -1, -1} // Servo index for X, Y, Z. Disable with -1
   #define SERVO_ENDSTOP_ANGLES {0,0, 0,0, 0,90} // X,Y,Z Axis Extend and Retract angles
  #endif
   // sometimes the weight of the servo arm and the shaking of he extruder causes the servo to slowly descend during printing until it 
@@ -79,7 +79,7 @@ Here are some standard links for getting your machine calibrated:
 
 // This determines the communication speed of the printer
 // :[2400,9600,19200,38400,57600,115200,250000]
-#define BAUDRATE 250000 //115200
+#define BAUDRATE 250000//115200//250000 //115200
 
 // This enables the serial port associated to the Bluetooth interface
 //#define BTENABLED              // Enable BT interface on AT90USB devices
@@ -88,7 +88,7 @@ Here are some standard links for getting your machine calibrated:
 // --- controller board selection
 // --- Please choose the name from boards.h that matches your setup
 // if you have a RAMPS shield, BOARD_RAMPS_13_EFB below is what you want
-//#define MOTHERBOARD BOARD_PICA // define this if you have a PICA rev b shield
+#define MOTHERBOARD BOARD_PICA // define this if you have a PICA rev b shield
 //#define MOTHERBOARD BOARD_PICA_REVC // define this if you have a PICA rev C shield
 //#define MOTHERBOARD BOARD_RAMPS_13_EFB
 
@@ -245,10 +245,10 @@ Here are some standard links for getting your machine calibrated:
 //    #define  DEFAULT_Ki 0.66
 //    #define  DEFAULT_Kd 51.92
 
-// This set of coefficients acquired with e3d-lite6 (mrice)
-    #define  DEFAULT_Kp 76
-    #define  DEFAULT_Ki 13
-    #define  DEFAULT_Kd 109
+// This set of coefficients acquired with e3d-lite6 with sock (rfleming) 
+    #define  DEFAULT_Kp 25.16
+    #define  DEFAULT_Ki 1.78
+    #define  DEFAULT_Kd 89.13
 
 // MakerGear
 //    #define  DEFAULT_Kp 7.0
@@ -289,9 +289,9 @@ Here are some standard links for getting your machine calibrated:
 //120v 250W silicone heater into 4mm borosilicate (MendelMax 1.5+)
 //from FOPDT model - kp=.39 Tp=405 Tdead=66, Tc set to 79.2, aggressive factor of .15 (vs .1, 1, 10)
     // mrice values for mk2a bed from autotune
-    #define  DEFAULT_bedKp 441.29
-    #define  DEFAULT_bedKi 54.3
-    #define  DEFAULT_bedKd 896.54
+    #define  DEFAULT_bedKp 330.92
+    #define  DEFAULT_bedKi 64.13
+    #define  DEFAULT_bedKd 426.93
 //120v 250W silicone heater into 4mm borosilicate (MendelMax 1.5+)
 //from pidautotune
 //    #define  DEFAULT_bedKp 97.1
@@ -414,7 +414,7 @@ const bool Z_PROBE_ENDSTOP_INVERTING = false; // set to true to invert the logic
 #define MOVE_MENU_PRECISE_MOVE_ITEMS
     
 // Invert the stepper direction. Change (or reverse the motor connector) if an axis goes the wrong way.
-#define INVERT_X_DIR false
+#define INVERT_X_DIR true
 #define INVERT_Y_DIR false
 #define INVERT_Z_DIR true
 
@@ -437,17 +437,19 @@ const bool Z_PROBE_ENDSTOP_INVERTING = false; // set to true to invert the logic
 // @section machine
 
 // Travel limits after homing (units are in mm)
-#ifndef MJRICE_BEDLEVELING_RACK
+/*#ifndef MJRICE_BEDLEVELING_RACK
 #define X_MIN_POS 0
 #else
 #define X_MIN_POS 0
-#endif
-
+#endif*/
+#define X_MIN_POS -8
+//X has about 212 total movement available, can be stretched if belt tension point is moved a bit
+//Y has about 320 total movement available
 #define Y_MIN_POS 0
 #define Z_MIN_POS 0
-#define X_MAX_POS 200
-#define Y_MAX_POS 300
-#define Z_MAX_POS 200
+#define X_MAX_POS 204
+#define Y_MAX_POS 315
+#define Z_MAX_POS 190
 
 //===========================================================================
 //============================= Filament Runout Sensor ======================
@@ -544,7 +546,7 @@ const bool Z_PROBE_ENDSTOP_INVERTING = false; // set to true to invert the logic
      #define X_PROBE_OFFSET_FROM_EXTRUDER -54     // Probe on: -left  +right
      #define Y_PROBE_OFFSET_FROM_EXTRUDER -7     // Probe on: -front +behind
      #define Z_PROBE_OFFSET_FROM_EXTRUDER -6  // -below (always!) // mrice: for wilson ts [ jhead use -18 for e3dlite use -7.7 ]
-     #define Z_RAISE_BEFORE_HOMING 15       // (in mm) Raise Z before homing (G28) for Probe Clearance.
+     #define Z_RAISE_BEFORE_HOMING 2       // (in mm) Raise Z before homing (G28) for Probe Clearance.
   #endif                                      // Be sure you have this distance over your Z_MAX_POS in case
 
   #define XY_TRAVEL_SPEED (100*60)         // X and Y axis travel speed between probes, in mm/min
@@ -565,7 +567,7 @@ const bool Z_PROBE_ENDSTOP_INVERTING = false; // set to true to invert the logic
 //If you have enabled the Bed Auto Leveling and are using the same Z Probe for Z Homing,
 //it is highly recommended you let this Z_SAFE_HOMING enabled!!!
 
-  #define Z_SAFE_HOMING   // This feature is meant to avoid Z homing with probe outside the bed area.
+  //#define Z_SAFE_HOMING   // This feature is meant to avoid Z homing with probe outside the bed area.
                           // When defined, it will:
                           // - Allow Z homing only after X and Y homing AND stepper drivers still enabled
                           // - If stepper drivers timeout, it will need X and Y homing again before Z homing
@@ -616,13 +618,13 @@ const bool Z_PROBE_ENDSTOP_INVERTING = false; // set to true to invert the logic
 // default settings
 #ifdef WILSON_TYPE
  #define HOMING_FEEDRATE               {50*60, 50*60, 3*60, 0}  // set the homing speeds (mm/min)
- #define DEFAULT_AXIS_STEPS_PER_UNIT   {80,80,4000,105}  // default steps per unit for Wilson 
+ #define DEFAULT_AXIS_STEPS_PER_UNIT   {80,80,4000,402}  // default steps per unit for Wilson with titan
  #define DEFAULT_MAX_FEEDRATE          {100, 100, 3, 25}    // (mm/sec)
  #define MANUAL_FEEDRATE               {50*60, 50*60, 4*60, 60}  // set the speeds for manual moves (mm/min) from panel
 #else
  #ifdef WILSON_II_TYPE
   #define HOMING_FEEDRATE              {50*60, 50*60, 4*60, 0}  // set the homing speeds (mm/min)
-  #define DEFAULT_AXIS_STEPS_PER_UNIT  {80,80,400,MK7_DEFAULT_STEPS}  // default steps per unit for Wilson II
+  #define DEFAULT_AXIS_STEPS_PER_UNIT  {80,80,400,96}  // default steps per unit for Wilson II
   #define DEFAULT_MAX_FEEDRATE         {120, 120, 6, 25}    // (mm/sec)
   #define MANUAL_FEEDRATE              {50*60, 50*60, 4*60, 60}  // set the speeds for manual moves (mm/min) from panel
  #else
@@ -720,7 +722,7 @@ const bool Z_PROBE_ENDSTOP_INVERTING = false; // set to true to invert the logic
 // The RepRapDiscount Smart Controller (white PCB)
 // http://reprap.org/wiki/RepRapDiscount_Smart_Controller
 
-#define REPRAP_DISCOUNT_SMART_CONTROLLER // this is the 20 x 4 line controller
+//#define REPRAP_DISCOUNT_SMART_CONTROLLER // this is the 20 x 4 line controller
 
 // The RepRapDiscount FULL GRAPHIC Smart Controller (quadratic white PCB)
 // http://reprap.org/wiki/RepRapDiscount_Full_Graphic_Smart_Controller
