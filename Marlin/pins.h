@@ -72,19 +72,9 @@
 #define KILL_PIN           -1
 #define ALARM_PIN          -1
 
-// The SDSS pin uses a different pin mapping from file Sd2PinMap.h
-#define SDSS               20
-
-#ifndef SDSUPPORT
-// these pins are defined in the SD library if building with SD support
-  #define SCK_PIN           9
-  #define MISO_PIN         11
-  #define MOSI_PIN         10
-#endif
 
 // Microstepping pins
 // Note that the pin mapping is not from fastio.h
-// See Sd2PinMap.h for the pin configurations
 #define X_MS1_PIN 25
 #define X_MS2_PIN 26
 #define Y_MS1_PIN 9
@@ -1279,25 +1269,7 @@
      //we have no buzzer installed
      #define BEEPER -1
      //LCD Pins
-     #ifdef DOGLCD
-       // Pins for DOGM SPI LCD Support
-       #define DOGLCD_A0  30
-       #define DOGLCD_CS  29
-       // GLCD features
-       #define LCD_CONTRAST 1
-       // Uncomment screen orientation
-         // #define LCD_SCREEN_ROT_0
-         // #define LCD_SCREEN_ROT_90
-       #define LCD_SCREEN_ROT_180
-         // #define LCD_SCREEN_ROT_270
-       #else // standard Hitachi LCD controller
-       #define LCD_PINS_RS        4
-       #define LCD_PINS_ENABLE    17
-       #define LCD_PINS_D4        30
-       #define LCD_PINS_D5        29
-       #define LCD_PINS_D6        28
-       #define LCD_PINS_D7        27
-     #endif
+     //rcf- removed dogm
      //The encoder and click button
      #define BTN_EN1 11
      #define BTN_EN2 10

@@ -41,7 +41,6 @@
 #include "stepper.h"
 #include "temperature.h"
 #include "motion_control.h"
-#include "cardreader.h"
 #include "watchdog.h"
 #include "ConfigurationStore.h"
 #include "language.h"
@@ -243,9 +242,7 @@ extern char msgscreen_1[20],msgscreen_2[20],msgscreen_3[20];
 //===========================================================================
 //=============================public variables=============================
 //===========================================================================
-#ifdef SDSUPPORT
-CardReader card;
-#endif
+
 float homing_feedrate[] = HOMING_FEEDRATE;
 bool axis_relative_modes[] = AXIS_RELATIVE_MODES;
 int feedmultiply=100; //100->1 200->2

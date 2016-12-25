@@ -27,7 +27,6 @@
 #include "temperature.h"
 
 #include "language.h"
-#include "cardreader.h"
 #include "speed_lookuptable.h"
 #if defined(DIGIPOTSS_PIN) && DIGIPOTSS_PIN > -1
 #include <SPI.h>

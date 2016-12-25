@@ -34,7 +34,6 @@
 #include "temperature.h"
 #include "watchdog.h"
 
-#include "Sd2PinMap.h"
 
 
 //===========================================================================
