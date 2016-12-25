@@ -752,7 +752,6 @@ ISR(TIMER1_COMPA_vect)
 
 void st_init()
 {
-  digipot_init(); //Initialize Digipot Motor Current
   microstep_init(); //Initialize Microstepping Pins
 
   //Initialize Dir Pins
@@ -1154,30 +1153,6 @@ void babystep(const uint8_t axis,const bool direction)
 void digitalPotWrite(int address, int value) // From Arduino DigitalPotControl example
 {
 
-}
-
-void digipot_init() //Initialize Digipot Motor Current
-{
-  #ifdef MOTOR_CURRENT_PWM_XY_PIN
-    pinMode(MOTOR_CURRENT_PWM_XY_PIN, OUTPUT);
-    pinMode(MOTOR_CURRENT_PWM_Z_PIN, OUTPUT);
-    pinMode(MOTOR_CURRENT_PWM_E_PIN, OUTPUT);
-    digipot_current(0, motor_current_setting[0]);
-    digipot_current(1, motor_current_setting[1]);
-    digipot_current(2, motor_current_setting[2]);
-    //Set timer5 to 31khz so the PWM of the motor power is as constant as possible. (removes a buzzing noise)
-    TCCR5B = (TCCR5B & ~(_BV(CS50) | _BV(CS51) | _BV(CS52))) | _BV(CS50);
-  #endif
-}
-
-void digipot_current(uint8_t driver, int current)
-{
-  
-  #ifdef MOTOR_CURRENT_PWM_XY_PIN
-  if (driver == 0) analogWrite(MOTOR_CURRENT_PWM_XY_PIN, (long)current * 255L / (long)MOTOR_CURRENT_PWM_RANGE);
-  if (driver == 1) analogWrite(MOTOR_CURRENT_PWM_Z_PIN, (long)current * 255L / (long)MOTOR_CURRENT_PWM_RANGE);
-  if (driver == 2) analogWrite(MOTOR_CURRENT_PWM_E_PIN, (long)current * 255L / (long)MOTOR_CURRENT_PWM_RANGE);
-  #endif
 }
 
 void microstep_init()

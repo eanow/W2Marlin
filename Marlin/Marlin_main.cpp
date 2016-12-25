@@ -193,11 +193,6 @@ extern char msgscreen_1[20],msgscreen_2[20],msgscreen_3[20];
  * M503 - Print the current settings (from memory not from EEPROM). Use S0 to leave off headings.
  * M540 - Use S[0|1] to enable or disable the stop SD card print on endstop hit (requires ABORT_ON_ENDSTOP_HIT_FEATURE_ENABLED)
  * M600 - Pause for filament change X[pos] Y[pos] Z[relative lift] E[initial retract] L[later retract distance for removal]
- * M665 - Set delta configurations: L<diagonal rod> R<delta radius> S<segments/s>
- * M666 - Set delta endstop adjustment
- * M605 - Set dual x-carriage movement mode: S<mode> [ X<duplication x-offset> R<duplication temp offset> ]
- * M907 - Set digital trimpot motor current using axis codes.
- * M908 - Control digital trimpot directly.
  * M350 - Set microstepping mode.
  * M351 - Toggle MS1 MS2 pins directly.
  *
@@ -2961,26 +2956,6 @@ Sigma_Exit:
     break;
     #endif //FILAMENTCHANGEENABLE
 
-
-    case 907: // M907 Set digital trimpot motor current using axis codes.
-    {
-      
-      #ifdef MOTOR_CURRENT_PWM_XY_PIN
-        if(code_seen('X')) digipot_current(0, code_value());
-      #endif
-      #ifdef MOTOR_CURRENT_PWM_Z_PIN
-        if(code_seen('Z')) digipot_current(1, code_value());
-      #endif
-      #ifdef MOTOR_CURRENT_PWM_E_PIN
-        if(code_seen('E')) digipot_current(2, code_value());
-      #endif
-    }
-    break;
-    case 908: // M908 Control digital trimpot directly.
-    {
-
-    }
-    break;
     case 350: // M350 Set microstepping mode. Warning: Steps per unit remains unchanged. S code sets stepping mode for all drivers.
     {
       #if defined(X_MS1_PIN) && X_MS1_PIN > -1

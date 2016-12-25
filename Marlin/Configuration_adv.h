@@ -215,16 +215,6 @@
 // Microstep setting (Only functional when stepper driver microstep pins are connected to MCU.
 #define MICROSTEP_MODES {16,16,16,16,16} // [1,2,4,8,16]
 
-// Motor Current setting (Only functional when motor driver current ref pins are connected to a digital trimpot on supported boards)
-#define DIGIPOT_MOTOR_CURRENT {135,135,135,135,135} // Values 0-255 (RAMBO 135 = ~0.75A, 185 = ~1A)
-
-// uncomment to enable an I2C based DIGIPOT like on the Azteeg X3 Pro
-//#define DIGIPOT_I2C
-// Number of channels available for I2C digipot, For Azteeg X3 Pro we have 8
-#define DIGIPOT_I2C_NUM_CHANNELS 8
-// actual motor currents in Amps, need as many here as DIGIPOT_I2C_NUM_CHANNELS
-#define DIGIPOT_I2C_MOTOR_CURRENTS {1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0}
-
 //===========================================================================
 //=============================Additional Features===========================
 //===========================================================================
@@ -276,15 +266,6 @@
   #define BABYSTEP_INVERT_Z false  //true for inverse movements in Z
   #define BABYSTEP_Z_MULTIPLICATOR 2 //faster z movements
 
-  #ifdef COREXY
-    #error BABYSTEPPING not implemented for COREXY yet.
-  #endif
-
-  #ifdef DELTA
-    #ifdef BABYSTEP_XY
-      #error BABYSTEPPING only implemented for Z axis on deltabots.
-    #endif
-  #endif
 #endif
 
 // extruder advance constant (s2/mm3)
@@ -382,10 +363,6 @@ const unsigned int dropsegments=5; //everything with less than this number of st
 //===========================================================================
 //=============================  Define Defines  ============================
 //===========================================================================
-
-#if defined (ENABLE_AUTO_BED_LEVELING) && defined (DELTA)
-  #error "Bed Auto Leveling is still not compatible with Delta Kinematics."
-#endif
 
 #if EXTRUDERS > 1 && defined TEMP_SENSOR_1_AS_REDUNDANT
   #error "You cannot use TEMP_SENSOR_1_AS_REDUNDANT if EXTRUDERS > 1"
