@@ -123,9 +123,7 @@ static long x_segment_time[3]={MAX_FREQ_TIME + 1,0,0};     // Segment times (in 
 static long y_segment_time[3]={MAX_FREQ_TIME + 1,0,0};
 #endif
 
-#ifdef FILAMENT_SENSOR
- static char meas_sample; //temporary variable to hold filament measurement sample
-#endif
+
 
 // Returns the index of the next block in the ring buffer
 // NOTE: Removed modulo (%) operator, which uses an expensive divide and multiplication.
@@ -458,20 +456,14 @@ void check_axes_activity()
   unsigned char z_active = 0;
   unsigned char e_active = 0;
   unsigned char tail_fan_speed = fanSpeed;
-  #ifdef BARICUDA
-  unsigned char tail_valve_pressure = ValvePressure;
-  unsigned char tail_e_to_p_pressure = EtoPPressure;
-  #endif
+  
   block_t *block;
 
   if(block_buffer_tail != block_buffer_head)
   {
     uint8_t block_index = block_buffer_tail;
     tail_fan_speed = block_buffer[block_index].fan_speed;
-    #ifdef BARICUDA
-    tail_valve_pressure = block_buffer[block_index].valve_pressure;
-    tail_e_to_p_pressure = block_buffer[block_index].e_to_p_pressure;
-    #endif
+
     while(block_index != block_buffer_head)
     {
       block = &block_buffer[block_index];
@@ -516,15 +508,7 @@ void check_axes_activity()
   getHighESpeed();
 #endif
 
-#ifdef BARICUDA
-  #if defined(HEATER_1_PIN) && HEATER_1_PIN > -1
-      analogWrite(HEATER_1_PIN,tail_valve_pressure);
-  #endif
 
-  #if defined(HEATER_2_PIN) && HEATER_2_PIN > -1
-      analogWrite(HEATER_2_PIN,tail_e_to_p_pressure);
-  #endif
-#endif
 }
 
 
@@ -615,10 +599,7 @@ block->steps_y = labs((target[X_AXIS]-position[X_AXIS]) - (target[Y_AXIS]-positi
   }
 
   block->fan_speed = fanSpeed;
-  #ifdef BARICUDA
-  block->valve_pressure = ValvePressure;
-  block->e_to_p_pressure = EtoPPressure;
-  #endif
+
 
   // Compute direction bits for this block 
   block->direction_bits = 0;
@@ -784,47 +765,7 @@ Having the real displacement of the head, we can calculate the total movement le
   block->nominal_speed = block->millimeters * inverse_second; // (mm/sec) Always > 0
   block->nominal_rate = ceil(block->step_event_count * inverse_second); // (step/sec) Always > 0
 
-#ifdef FILAMENT_SENSOR
-  //FMM update ring buffer used for delay with filament measurements
-  
-  
-    if((extruder==FILAMENT_SENSOR_EXTRUDER_NUM) && (delay_index2 > -1))  //only for extruder with filament sensor and if ring buffer is initialized
-  	  {
-    delay_dist = delay_dist + delta_mm[E_AXIS];  //increment counter with next move in e axis
-  
-    while (delay_dist >= (10*(MAX_MEASUREMENT_DELAY+1)))  //check if counter is over max buffer size in mm
-      	  delay_dist = delay_dist - 10*(MAX_MEASUREMENT_DELAY+1);  //loop around the buffer
-    while (delay_dist<0)
-    	  delay_dist = delay_dist + 10*(MAX_MEASUREMENT_DELAY+1); //loop around the buffer
-      
-    delay_index1=delay_dist/10.0;  //calculate index
-    
-    //ensure the number is within range of the array after converting from floating point
-    if(delay_index1<0)
-    	delay_index1=0;
-    else if (delay_index1>MAX_MEASUREMENT_DELAY)
-    	delay_index1=MAX_MEASUREMENT_DELAY;
-    	
-    if(delay_index1 != delay_index2)  //moved index
-  	  {
-    	meas_sample=widthFil_to_size_ratio()-100;  //subtract off 100 to reduce magnitude - to store in a signed char
-  	  }
-    while( delay_index1 != delay_index2)
-  	  {
-  	  delay_index2 = delay_index2 + 1;
-  	if(delay_index2>MAX_MEASUREMENT_DELAY)
-  			  delay_index2=delay_index2-(MAX_MEASUREMENT_DELAY+1);  //loop around buffer when incrementing
-  	  if(delay_index2<0)
-  		delay_index2=0;
-  	  else if (delay_index2>MAX_MEASUREMENT_DELAY)
-  		delay_index2=MAX_MEASUREMENT_DELAY;  
-  	  
-  	  measurement_delay[delay_index2]=meas_sample;
-  	  }
-    	
-    
-  	  }
-#endif
+
 
 
   // Calculate and limit speed in mm/sec for each axis

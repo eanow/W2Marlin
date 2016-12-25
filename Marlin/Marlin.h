@@ -20,14 +20,6 @@
 #include "fastio.h"
 #include "Configuration.h"
 
-#ifdef REPRAP_DISCOUNT_SMART_CONTROLLER // this requires these:
- #define ULTIPANEL
- #define NEWPANEL
- #define ULTRA_LCD
- #define LCD_WIDTH 20
- #define LCD_HEIGHT 4
- #define SDSUPPORT
-#endif
 
 #ifdef ENDSTOPPULLUPS // this implies these:
  #define ENDSTOPPULLUP_XMIN           
@@ -144,10 +136,7 @@ void process_commands();
 
 void manage_inactivity(bool ignore_stepper_queue=false);
 
-#if defined(DUAL_X_CARRIAGE) && defined(X_ENABLE_PIN) && X_ENABLE_PIN > -1 && defined(X2_ENABLE_PIN) && X2_ENABLE_PIN > -1
-  #define  enable_x() do { WRITE(X_ENABLE_PIN, X_ENABLE_ON); WRITE(X2_ENABLE_PIN, X_ENABLE_ON); } while (0)
-  #define disable_x() do { WRITE(X_ENABLE_PIN,!X_ENABLE_ON); WRITE(X2_ENABLE_PIN,!X_ENABLE_ON); axis_known_position[X_AXIS] = false; } while (0)
-#elif defined(X_ENABLE_PIN) && X_ENABLE_PIN > -1
+#if defined(X_ENABLE_PIN) && X_ENABLE_PIN > -1
   #define  enable_x() WRITE(X_ENABLE_PIN, X_ENABLE_ON)
   #define disable_x() { WRITE(X_ENABLE_PIN,!X_ENABLE_ON); axis_known_position[X_AXIS] = false; }
 #else
@@ -286,24 +275,11 @@ extern float x_right_stop_pos;
 extern bool axis_known_position[3];
 extern float zprobe_zoffset;
 extern int fanSpeed;
-#ifdef BARICUDA
-extern int ValvePressure;
-extern int EtoPPressure;
-#endif
 
 #ifdef FAN_SOFT_PWM
 extern unsigned char fanSpeedSoftPwm;
 #endif
 
-#ifdef FILAMENT_SENSOR
-  extern float filament_width_nominal;  //holds the theoretical filament diameter ie., 3.00 or 1.75
-  extern bool filament_sensor;  //indicates that filament sensor readings should control extrusion
-  extern float filament_width_meas; //holds the filament diameter as accurately measured
-  extern signed char measurement_delay[];  //ring buffer to delay measurement
-  extern int delay_index1, delay_index2;  //index into ring buffer
-  extern float delay_dist; //delay distance counter
-  extern int meas_delay_cm; //delay distance
-#endif
 
 #ifdef FWRETRACT
 extern bool autoretract_enabled;

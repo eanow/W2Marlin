@@ -59,10 +59,10 @@ void Config_StoreSettings()
   EEPROM_WRITE_VAR(i,delta_diagonal_rod);
   EEPROM_WRITE_VAR(i,delta_segments_per_second);
   #endif
-  #ifndef ULTIPANEL
+
   int plaPreheatHotendTemp = PLA_PREHEAT_HOTEND_TEMP, plaPreheatHPBTemp = PLA_PREHEAT_HPB_TEMP, plaPreheatFanSpeed = PLA_PREHEAT_FAN_SPEED;
   int absPreheatHotendTemp = ABS_PREHEAT_HOTEND_TEMP, absPreheatHPBTemp = ABS_PREHEAT_HPB_TEMP, absPreheatFanSpeed = ABS_PREHEAT_FAN_SPEED;
-  #endif
+
   EEPROM_WRITE_VAR(i,plaPreheatHotendTemp);
   EEPROM_WRITE_VAR(i,plaPreheatHPBTemp);
   EEPROM_WRITE_VAR(i,plaPreheatFanSpeed);
@@ -299,10 +299,10 @@ void Config_RetrieveSettings()
 		EEPROM_READ_VAR(i,delta_diagonal_rod);
 		EEPROM_READ_VAR(i,delta_segments_per_second);
         #endif
-        #ifndef ULTIPANEL
+        
         int plaPreheatHotendTemp, plaPreheatHPBTemp, plaPreheatFanSpeed;
         int absPreheatHotendTemp, absPreheatHPBTemp, absPreheatFanSpeed;
-        #endif
+        
         EEPROM_READ_VAR(i,plaPreheatHotendTemp);
         EEPROM_READ_VAR(i,plaPreheatHPBTemp);
         EEPROM_READ_VAR(i,plaPreheatFanSpeed);
@@ -406,14 +406,7 @@ void Config_ResetDefault()
 	delta_segments_per_second= DELTA_SEGMENTS_PER_SECOND;
 	recalc_delta_settings(delta_radius, delta_diagonal_rod);
 #endif
-#ifdef ULTIPANEL
-    plaPreheatHotendTemp = PLA_PREHEAT_HOTEND_TEMP;
-    plaPreheatHPBTemp = PLA_PREHEAT_HPB_TEMP;
-    plaPreheatFanSpeed = PLA_PREHEAT_FAN_SPEED;
-    absPreheatHotendTemp = ABS_PREHEAT_HOTEND_TEMP;
-    absPreheatHPBTemp = ABS_PREHEAT_HPB_TEMP;
-    absPreheatFanSpeed = ABS_PREHEAT_FAN_SPEED;
-#endif
+
 #ifdef ENABLE_AUTO_BED_LEVELING
     zprobe_zoffset = -Z_PROBE_OFFSET_FROM_EXTRUDER;
 #endif
