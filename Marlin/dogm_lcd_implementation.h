@@ -42,16 +42,6 @@
 #define LCD_CLASS LiquidCrystal
 LCD_CLASS lcd(LCD_PINS_RS, LCD_PINS_ENABLE, LCD_PINS_D4, LCD_PINS_D5, LCD_PINS_D6, LCD_PINS_D7);  //RS, enable, D4, D5, D6, D7
 
-/* Russian language not supported yet, needs custom font
-
-#ifdef LANGUAGE_RU
-#include "LiquidCrystalRus.h"
-#define LCD_CLASS LiquidCrystalRus
-#else
-#include <LiquidCrystal.h>
-#define LCD_CLASS LiquidCrystal
-#endif
-*/
 
 // DOGM parameters (size in pixels)
 #define DOG_CHAR_WIDTH			6

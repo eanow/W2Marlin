@@ -201,13 +201,10 @@ extern volatile uint16_t buttons;  //an extended version of the last checked but
 
 #else
   // Standard directly connected LCD implementations
-  #ifdef LANGUAGE_RU
-    #include "LiquidCrystalRus.h"
-    #define LCD_CLASS LiquidCrystalRus
-  #else 
-    #include <LiquidCrystal.h>
-    #define LCD_CLASS LiquidCrystal
-  #endif  
+  
+  #include <LiquidCrystal.h>
+  #define LCD_CLASS LiquidCrystal
+ 
   LCD_CLASS lcd(LCD_PINS_RS, LCD_PINS_ENABLE, LCD_PINS_D4, LCD_PINS_D5,LCD_PINS_D6,LCD_PINS_D7);  //RS,Enable,D4,D5,D6,D7
 #endif
 
