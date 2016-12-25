@@ -37,9 +37,6 @@
  #define Z_SAFE_HOMING_Y_POINT (Y_MAX_LENGTH/2)    // Y point for Z homing when homing all axis (G28)
 #endif
 
-#ifndef NUM_SERVOS
-#define NUM_SERVOS 0
-#endif
 
 #include "Configuration_adv.h"
 #include "thermistortables.h"
@@ -262,14 +259,6 @@ extern int fanSpeed;
 
 #ifdef FAN_SOFT_PWM
 extern unsigned char fanSpeedSoftPwm;
-#endif
-
-
-#ifdef FWRETRACT
-extern bool autoretract_enabled;
-extern bool retracted[EXTRUDERS];
-extern float retract_length, retract_length_swap, retract_feedrate, retract_zlift;
-extern float retract_recover_length, retract_recover_length_swap, retract_recover_feedrate;
 #endif
 
 extern unsigned long starttime;

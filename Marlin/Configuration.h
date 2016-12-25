@@ -30,24 +30,16 @@ Here are some standard links for getting your machine calibrated:
 #ifdef MY_BEDLEVELING_DEFAULTS
  #define ENABLE_AUTO_BED_LEVELING // Delete the comment to enable (remove // at the start of the line)
  #define MANUAL_BED_LEVELING  // Add display menu option for bed leveling
- #ifndef MJRICE_BEDLEVELING_RACK // this does not use servos
-  #define NUM_SERVOS 3 // Servo index starts with 0 for M280 command
-  #define SERVO_ENDSTOPS {-1, -1, -1} // Servo index for X, Y, Z. Disable with -1
-  #define SERVO_ENDSTOP_ANGLES {0,0, 0,0, 0,90} // X,Y,Z Axis Extend and Retract angles
+ #ifndef MJRICE_BEDLEVELING_RACK // this does not use s-rvos
  #endif
-  // sometimes the weight of the servo arm and the shaking of he extruder causes the servo to slowly descend during printing until it 
-  // interferes with the print.  
-  // There are two things I could do.  The first one (not using) just keeps the servo attached all the time.
-  //#define DONT_DETACH_SERVOS  // Dont use this unless you're desperate. If you use this to keep the servos rigidly in place, make sure you are powering the servos from an adequate source (not the arduino 5V regulator)
-  // But this one seems to work nicely, it will just periodically put the servo back to where it is supposed to be:
-  #define NO_RETRACT_BETWEEN_PROBINGS // Define this unless you want to waste time moving the servo probe up and down between each point.
-  #define PERIODICALLY_REFRESH_SERVO
-  #define SERVO_REFRESH_INTERVAL 10000 // ms
+
+  
+
 #endif
 
 #ifdef MJRICE_BEDLEVELING_RACK
 #define NO_RETRACT_BETWEEN_PROBINGS
-#undef SERVO_ENDSTOPS // this option does not use servo
+
 #endif
 
 // User-specified version info of this build to display in [Pronterface, etc] terminal window during
@@ -250,17 +242,10 @@ Here are some standard links for getting your machine calibrated:
 //#define PID_BED_DEBUG // Sends debug data to the serial port.
 
 #ifdef PIDTEMPBED
-//120v 250W silicone heater into 4mm borosilicate (MendelMax 1.5+)
-//from FOPDT model - kp=.39 Tp=405 Tdead=66, Tc set to 79.2, aggressive factor of .15 (vs .1, 1, 10)
-    // mrice values for mk2a bed from autotune
-    #define  DEFAULT_bedKp 330.92
-    #define  DEFAULT_bedKi 64.13
-    #define  DEFAULT_bedKd 426.93
-//120v 250W silicone heater into 4mm borosilicate (MendelMax 1.5+)
-//from pidautotune
-//    #define  DEFAULT_bedKp 97.1
-//    #define  DEFAULT_bedKi 1.41
-//    #define  DEFAULT_bedKd 1675.16
+  // rcf values for mk2a bed from autotune
+  #define  DEFAULT_bedKp 330.92
+  #define  DEFAULT_bedKi 64.13
+  #define  DEFAULT_bedKd 426.93
 
 // FIND YOUR OWN: "M303 E-1 C8 S90" to run autotune on the bed at 90 degreesC for 8 cycles.
 #endif // PIDTEMPBED
@@ -415,16 +400,6 @@ const bool Z_PROBE_ENDSTOP_INVERTING = false; // set to true to invert the logic
 #define Y_MAX_POS 315
 #define Z_MAX_POS 190
 
-//===========================================================================
-//============================= Filament Runout Sensor ======================
-//===========================================================================
-//#define FILAMENT_RUNOUT_SENSOR // Uncomment for defining a filament runout sensor such as a mechanical or opto endstop to check the existence of filament
-                                 // In RAMPS uses servo pin 2. Can be changed in pins file. For other boards pin definition should be made.
-                                 // It is assumed that when logic high = filament available
-                                 //                    when logic  low = filament ran out
-//const bool FIL_RUNOUT_INVERTING = true;  // Should be uncommented and true or false should assigned
-//#define ENDSTOPPULLUP_FIL_RUNOUT // Uncomment to use internal pullup for filament runout pins if the sensor is defined.
-
 
 //===========================================================================
 //============================ Mesh Bed Leveling ============================
@@ -506,11 +481,10 @@ const bool Z_PROBE_ENDSTOP_INVERTING = false; // set to true to invert the logic
      #define Z_PROBE_OFFSET_FROM_EXTRUDER -11  // -below (always!) 
      #define Z_RAISE_BEFORE_HOMING 10       // (in mm) Raise Z before homing (G28) for Probe Clearance.
   #else
-     // for servo mounted z probe
      #define X_PROBE_OFFSET_FROM_EXTRUDER -54     // Probe on: -left  +right
      #define Y_PROBE_OFFSET_FROM_EXTRUDER -7     // Probe on: -front +behind
      #define Z_PROBE_OFFSET_FROM_EXTRUDER -6  // -below (always!) // mrice: for wilson ts [ jhead use -18 for e3dlite use -7.7 ]
-     #define Z_RAISE_BEFORE_HOMING 2       // (in mm) Raise Z before homing (G28) for Probe Clearance.
+     #define Z_RAISE_BEFORE_HOMING 15       // (in mm) Raise Z before homing (G28) for Probe Clearance.
   #endif                                      // Be sure you have this distance over your Z_MAX_POS in case
 
   #define XY_TRAVEL_SPEED (100*60)         // X and Y axis travel speed between probes, in mm/min
@@ -522,11 +496,6 @@ const bool Z_PROBE_ENDSTOP_INVERTING = false; // set to true to invert the logic
 //   #define Z_PROBE_END_SCRIPT "G1 Z10 F12000\nG1 X15 Y330\nG1 Z0.5\nG1 Z10" //These commands will be executed in the end of G29 routine.
                                                                             //Useful to retract a deployable probe.
                                                                        
-  //If defined, the Probe servo will be turned on only during movement and then turned off to avoid jerk
-  //The value is the delay to turn the servo off after powered on - depends on the servo speed; 300ms is good value, but you can try lower it.
-  // You MUST HAVE the SERVO_ENDSTOPS defined to use here a value higher than zero otherwise your code will not compile.
-
-  #define PROBE_SERVO_DEACTIVATION_DELAY 500 /* milliseconds */
 
 //If you have enabled the Bed Auto Leveling and are using the same Z Probe for Z Homing,
 //it is highly recommended you let this Z_SAFE_HOMING enabled!!!
@@ -543,11 +512,7 @@ const bool Z_PROBE_ENDSTOP_INVERTING = false; // set to true to invert the logic
   // If you want to still use the Z min endstop for homing, disable Z_SAFE_HOMING above. Eg; to park the head outside the bed area when homing with G28.
   // WARNING: The Z MIN endstop will need to set properly as it would without a Z PROBE to prevent head crashes and premature stopping during a print.
   // To use a separate Z PROBE endstop, you must have a Z_PROBE_PIN defined in the pins.h file for your control board.
-  // If you are using a servo based Z PROBE, you will need to enable NUM_SERVOS, SERVO_ENDSTOPS and SERVO_ENDSTOPS_ANGLES in the R/C Servo below.
-  // RAMPS 1.3/1.4 boards may be able to use the 5V, Ground and the D32 pin in the Aux 4 section of the RAMPS board. Use 5V for powered sensors, otherwise connect to ground and D32
-  // for normally closed configuration and 5V and D32 for normally open configurations. Normally closed configuration is advised and assumed.
-  // The D32 pin in Aux 4 on RAMPS maps to the Arduino D32 pin. Z_PROBE_PIN is setting the pin to use on the Arduino. Since the D32 pin on the RAMPS maps to D32 on Arduino, this works.
-  // D32 is currently selected in the RAMPS 1.3/1.4 pin file. All other boards will need changes to the respective pins_XXXXX.h file.
+
   // WARNING: Setting the wrong pin may have unexpected and potentially disastrous outcomes. Use with caution and do your homework.
 
   //#define Z_PROBE_ENDSTOP
@@ -697,32 +662,6 @@ const bool Z_PROBE_ENDSTOP_INVERTING = false; // set to true to invert the logic
 // SkeinForge sends the wrong arc g-codes when using Arc Point as fillet procedure
 //#define SF_ARC_FIX
 
-
-//define BlinkM/CyzRgb Support
-//#define BLINKM
-
-
-/*********************************************************************\
-* R/C SERVO support
-* Sponsored by TrinityLabs, Reworked by codexmas
-**********************************************************************/
-
-// Number of servos
-//
-// If you select a configuration below, this will receive a default value and does not need to be set manually
-// set it manually if you have more servos than extruders and wish to manually control some
-// leaving it undefined or defining as 0 will disable the servo subsystem
-// If unsure, leave commented / disabled
-//
-//#define NUM_SERVOS 3 // Servo index starts with 0 for M280 command
-
-// Servo Endstops
-//
-// This allows for servo actuated endstops, primary usage is for the Z Axis to eliminate calibration or bed height changes.
-// Use M851 to set the z-probe vertical offset from the nozzle. Store that setting with M500.
-//
-//#define SERVO_ENDSTOPS {-1, -1, 2} // Servo index for X, Y, Z. Disable with -1
-//#define SERVO_ENDSTOP_ANGLES {0,0, 0,0, 0,90} // X,Y,Z Axis Extend and Retract angles
 
 /**********************************************************************\
  * Support for a filament diameter sensor

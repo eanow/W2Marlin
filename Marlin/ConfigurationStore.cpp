@@ -79,23 +79,7 @@ void Config_StoreSettings()
     int lcd_contrast = 32;
   #endif
   EEPROM_WRITE_VAR(i,lcd_contrast);
-  #ifdef SCARA
-  EEPROM_WRITE_VAR(i,axis_scaling);        // Add scaling for SCARA
-  #endif
-  #ifdef FWRETRACT
-  EEPROM_WRITE_VAR(i,autoretract_enabled);
-  EEPROM_WRITE_VAR(i,retract_length);
-  #if EXTRUDERS > 1
-  EEPROM_WRITE_VAR(i,retract_length_swap);
-  #endif
-  EEPROM_WRITE_VAR(i,retract_feedrate);
-  EEPROM_WRITE_VAR(i,retract_zlift);
-  EEPROM_WRITE_VAR(i,retract_recover_length);
-  #if EXTRUDERS > 1
-  EEPROM_WRITE_VAR(i,retract_recover_length_swap);
-  #endif
-  EEPROM_WRITE_VAR(i,retract_recover_feedrate);
-  #endif
+
 
   // Save filament sizes
   EEPROM_WRITE_VAR(i, volumetric_enabled);
@@ -131,16 +115,7 @@ void Config_PrintSettings()
     SERIAL_ECHOLN("");
       
     SERIAL_ECHO_START;
-#ifdef SCARA
-SERIAL_ECHOLNPGM("Scaling factors:");
-    SERIAL_ECHO_START;
-    SERIAL_ECHOPAIR("  M365 X",axis_scaling[X_AXIS]);
-    SERIAL_ECHOPAIR(" Y",axis_scaling[Y_AXIS]);
-    SERIAL_ECHOPAIR(" Z",axis_scaling[Z_AXIS]);
-    SERIAL_ECHOLN("");
-      
-    SERIAL_ECHO_START;
-#endif
+
     SERIAL_ECHOLNPGM("Maximum feedrates (mm/s):");
     SERIAL_ECHO_START;
     SERIAL_ECHOPAIR("  M203 X", max_feedrate[X_AXIS]);
@@ -192,55 +167,7 @@ SERIAL_ECHOLNPGM("Scaling factors:");
     SERIAL_ECHOPAIR(" D" ,unscalePID_d(Kd));
     SERIAL_ECHOLN(""); 
 #endif
-#ifdef FWRETRACT
-    SERIAL_ECHO_START;
-    SERIAL_ECHOLNPGM("Retract: S=Length (mm) F:Speed (mm/m) Z: ZLift (mm)");
-    SERIAL_ECHO_START;
-    SERIAL_ECHOPAIR("   M207 S",retract_length); 
-    SERIAL_ECHOPAIR(" F" ,retract_feedrate*60); 
-    SERIAL_ECHOPAIR(" Z" ,retract_zlift);
-    SERIAL_ECHOLN(""); 
-    SERIAL_ECHO_START;
-    SERIAL_ECHOLNPGM("Recover: S=Extra length (mm) F:Speed (mm/m)");
-    SERIAL_ECHO_START;
-    SERIAL_ECHOPAIR("   M208 S",retract_recover_length);
-    SERIAL_ECHOPAIR(" F", retract_recover_feedrate*60);
-	SERIAL_ECHOLN("");
-    SERIAL_ECHO_START;
-    SERIAL_ECHOLNPGM("Auto-Retract: S=0 to disable, 1 to interpret extrude-only moves as retracts or recoveries");
-    SERIAL_ECHO_START;
-    SERIAL_ECHOPAIR("   M209 S", (unsigned long)(autoretract_enabled ? 1 : 0));
-    SERIAL_ECHOLN("");
-#if EXTRUDERS > 1
-    SERIAL_ECHO_START;
-    SERIAL_ECHOLNPGM("Multi-extruder settings:");
-    SERIAL_ECHO_START;
-    SERIAL_ECHOPAIR("   Swap retract length (mm):    ", retract_length_swap);
-    SERIAL_ECHOLN("");
-    SERIAL_ECHO_START;
-    SERIAL_ECHOPAIR("   Swap rec. addl. length (mm): ", retract_recover_length_swap);
-    SERIAL_ECHOLN("");
-#endif
-    SERIAL_ECHO_START;
-    if (volumetric_enabled) {
-        SERIAL_ECHOLNPGM("Filament settings:");
-        SERIAL_ECHO_START;
-        SERIAL_ECHOPAIR("   M200 D", filament_size[0]);
-        SERIAL_ECHOLN(""); 
-#if EXTRUDERS > 1
-		SERIAL_ECHO_START;
-        SERIAL_ECHOPAIR("   M200 T1 D", filament_size[1]);
-        SERIAL_ECHOLN(""); 
-#if EXTRUDERS > 2
-		SERIAL_ECHO_START;
-        SERIAL_ECHOPAIR("   M200 T2 D", filament_size[2]);
-		SERIAL_ECHOLN("");
-#endif
-#endif
-    } else {
-        SERIAL_ECHOLNPGM("Filament settings: Disabled");
-    }
-#endif
+
 }
 #endif
 
@@ -294,24 +221,8 @@ void Config_RetrieveSettings()
         int lcd_contrast;
         #endif
         EEPROM_READ_VAR(i,lcd_contrast);
-		#ifdef SCARA
-		EEPROM_READ_VAR(i,axis_scaling);
-		#endif
 
-		#ifdef FWRETRACT
-		EEPROM_READ_VAR(i,autoretract_enabled);
-		EEPROM_READ_VAR(i,retract_length);
-		#if EXTRUDERS > 1
-		EEPROM_READ_VAR(i,retract_length_swap);
-		#endif
-		EEPROM_READ_VAR(i,retract_feedrate);
-		EEPROM_READ_VAR(i,retract_zlift);
-		EEPROM_READ_VAR(i,retract_recover_length);
-		#if EXTRUDERS > 1
-		EEPROM_READ_VAR(i,retract_recover_length_swap);
-		#endif
-		EEPROM_READ_VAR(i,retract_recover_feedrate);
-		#endif
+
 
 		EEPROM_READ_VAR(i, volumetric_enabled);
 		EEPROM_READ_VAR(i, filament_size[0]);
@@ -355,9 +266,6 @@ void Config_ResetDefault()
         axis_steps_per_unit[i]=tmp1[i];  
         max_feedrate[i]=tmp2[i];  
         max_acceleration_units_per_sq_second[i]=tmp3[i];
-		#ifdef SCARA
-		axis_scaling[i]=1;
-		#endif
     }
     
     // steps per sq second need to be updated to agree with the units per sq second
@@ -376,9 +284,7 @@ void Config_ResetDefault()
 #ifdef ENABLE_AUTO_BED_LEVELING
     zprobe_zoffset = -Z_PROBE_OFFSET_FROM_EXTRUDER;
 #endif
-//#ifdef DOGLCD
-//    lcd_contrast = DEFAULT_LCD_CONTRAST;
-//#endif
+
 #ifdef PIDTEMP
     Kp = DEFAULT_Kp;
     Ki = scalePID_i(DEFAULT_Ki);
@@ -391,21 +297,6 @@ void Config_ResetDefault()
     Kc = DEFAULT_Kc;
 #endif//PID_ADD_EXTRUSION_RATE
 #endif//PIDTEMP
-
-#ifdef FWRETRACT
-	autoretract_enabled = false;
-	retract_length = RETRACT_LENGTH;
-#if EXTRUDERS > 1
-	retract_length_swap = RETRACT_LENGTH_SWAP;
-#endif
-	retract_feedrate = RETRACT_FEEDRATE;
-	retract_zlift = RETRACT_ZLIFT;
-	retract_recover_length = RETRACT_RECOVER_LENGTH;
-#if EXTRUDERS > 1
-	retract_recover_length_swap = RETRACT_RECOVER_LENGTH_SWAP;
-#endif
-	retract_recover_feedrate = RETRACT_RECOVER_FEEDRATE;
-#endif
 
 	volumetric_enabled = false;
 	filament_size[0] = DEFAULT_NOMINAL_FILAMENT_DIA;
