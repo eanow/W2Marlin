@@ -20,20 +20,6 @@ Here are some standard links for getting your machine calibrated:
 // Advanced settings can be found in Configuration_adv.h
 // BASIC SETTINGS: select your board type, temperature sensor type, axis scaling, and endstop configuration
 
-//===========================================================================
-//============================= DELTA Printer ===============================
-//===========================================================================
-// For a Delta printer replace the configuration files with the files in the
-// example_configurations/delta directory.
-//
-
-//===========================================================================
-//============================= SCARA Printer ===============================
-//===========================================================================
-// For a Scara printer replace the configuration files with the files in the
-// example_configurations/SCARA directory.
-//
-
 // @section info
 //#define WILSON_TYPE           // comment this out if not wilson
 #define WILSON_II_TYPE        // comment this out if not wilson ii
@@ -67,9 +53,9 @@ Here are some standard links for getting your machine calibrated:
 // User-specified version info of this build to display in [Pronterface, etc] terminal window during
 // startup. Implementation of an idea by Prof Braino to inform user that any changes made to this
 // build by the user have been successfully uploaded into firmware.
-#define STRING_VERSION "1.0.4-mjr"
+#define STRING_VERSION "1.0.0-rcf"
 #define STRING_VERSION_CONFIG_H __DATE__ " " __TIME__ // build date and time
-#define STRING_CONFIG_H_AUTHOR "(mrice, default config)" // Who made the changes.
+#define STRING_CONFIG_H_AUTHOR "(rfleming, default config)" // Who made the changes.
 
 // SERIAL_PORT selects which serial port should be used for communication with the host.
 // This allows the connection of wireless adapters (for instance) to non-default port pins.
@@ -96,9 +82,6 @@ Here are some standard links for getting your machine calibrated:
 #error Choose a motherboard by uncommenting one of the lines above
 #endif
 
-#ifdef GT2560
-  #define MOTHERBOARD BOARD_ULTIMAKER 
-#endif
 // ---
 
 // Optional custom name for your RepStrap or other custom machine
@@ -233,32 +216,13 @@ Here are some standard links for getting your machine calibrated:
   #define PID_INTEGRAL_DRIVE_MAX PID_MAX  //limit for the integral term
   #define K1 0.95 //smoothing factor within the PID
   #define PID_dT ((OVERSAMPLENR * 10.0)/(F_CPU / 64.0 / 256.0)) //sampling period of the temperature routine
-  
-// If you are using a pre-configured hotend then you can use one of the value sets by uncommenting it
-// Ultimaker
-//    #define  DEFAULT_Kp 22.2
-//    #define  DEFAULT_Ki 1.08
-//    #define  DEFAULT_Kd 114
 
-// This set of coefficients acquired with JHead and 12V/40W heater (mrice)
-//    #define  DEFAULT_Kp 11.68
-//    #define  DEFAULT_Ki 0.66
-//    #define  DEFAULT_Kd 51.92
 
 // This set of coefficients acquired with e3d-lite6 with sock (rfleming) 
     #define  DEFAULT_Kp 25.16
     #define  DEFAULT_Ki 1.78
     #define  DEFAULT_Kd 89.13
 
-// MakerGear
-//    #define  DEFAULT_Kp 7.0
-//    #define  DEFAULT_Ki 0.1
-//    #define  DEFAULT_Kd 12
-
-// Mendel Parts V9 on 12V
-//    #define  DEFAULT_Kp 63.0
-//    #define  DEFAULT_Ki 2.25
-//    #define  DEFAULT_Kd 440
 #endif // PIDTEMP
 
 //===========================================================================
@@ -616,23 +580,18 @@ const bool Z_PROBE_ENDSTOP_INVERTING = false; // set to true to invert the logic
 #define MK8_DEFAULT_STEPS 150
 
 // default settings
-#ifdef WILSON_TYPE
- #define HOMING_FEEDRATE               {50*60, 50*60, 3*60, 0}  // set the homing speeds (mm/min)
- #define DEFAULT_AXIS_STEPS_PER_UNIT   {80,80,4000,402}  // default steps per unit for Wilson with titan
- #define DEFAULT_MAX_FEEDRATE          {100, 100, 3, 25}    // (mm/sec)
- #define MANUAL_FEEDRATE               {50*60, 50*60, 4*60, 60}  // set the speeds for manual moves (mm/min) from panel
+
+
+#ifdef WILSON_II_TYPE
+#define HOMING_FEEDRATE              {50*60, 50*60, 4*60, 0}  // set the homing speeds (mm/min)
+#define DEFAULT_AXIS_STEPS_PER_UNIT  {80,80,400,96}  // default steps per unit for Wilson II
+#define DEFAULT_MAX_FEEDRATE         {120, 120, 6, 25}    // (mm/sec)
+#define MANUAL_FEEDRATE              {50*60, 50*60, 4*60, 60}  // set the speeds for manual moves (mm/min) from panel
 #else
- #ifdef WILSON_II_TYPE
-  #define HOMING_FEEDRATE              {50*60, 50*60, 4*60, 0}  // set the homing speeds (mm/min)
-  #define DEFAULT_AXIS_STEPS_PER_UNIT  {80,80,400,96}  // default steps per unit for Wilson II
-  #define DEFAULT_MAX_FEEDRATE         {120, 120, 6, 25}    // (mm/sec)
-  #define MANUAL_FEEDRATE              {50*60, 50*60, 4*60, 60}  // set the speeds for manual moves (mm/min) from panel
- #else
-  #define HOMING_FEEDRATE              {100*60, 100*60, 4*60, 0}  // set the homing speeds (mm/min)
-  #define DEFAULT_AXIS_STEPS_PER_UNIT  {80,80,4000,105}  // default steps 
-  #define DEFAULT_MAX_FEEDRATE         {100, 100, 3, 25}    // (mm/sec)
-  #define MANUAL_FEEDRATE              {50*60, 50*60, 4*60, 60}  // set the speeds for manual moves (mm/min) from panel
- #endif
+#define HOMING_FEEDRATE              {100*60, 100*60, 4*60, 0}  // set the homing speeds (mm/min)
+#define DEFAULT_AXIS_STEPS_PER_UNIT  {80,80,4000,105}  // default steps 
+#define DEFAULT_MAX_FEEDRATE         {100, 100, 3, 25}    // (mm/sec)
+#define MANUAL_FEEDRATE              {50*60, 50*60, 4*60, 60}  // set the speeds for manual moves (mm/min) from panel
 #endif
 
 #define DEFAULT_MAX_ACCELERATION      {3000,3000,100,10000}    // X, Y, Z, E maximum start speed for accelerated moves. E default values are good for Skeinforge 40+, for older versions raise them a lot.
@@ -704,37 +663,11 @@ const bool Z_PROBE_ENDSTOP_INVERTING = false; // set to true to invert the logic
   //#define DISPLAY_CHARSET_HD44780_WESTERN
   //#define DISPLAY_CHARSET_HD44780_CYRILLIC
 
-//#define ULTRA_LCD  //general LCD support, also 16x2
-//#define DOGLCD  // Support for SPI LCD 128x64 (Controller ST7565R graphic Display Family)
-//#define SDSUPPORT // Enable SD Card Support in Hardware Console
-//#define SDSLOW // Use slower SD transfer mode (not normally needed - uncomment if you're getting volume init error)
-//#define SD_CHECK_AND_RETRY // Use CRC checks and retries on the SD communication
+
 #define ENCODER_PULSES_PER_STEP 4 // Increase if you have a high resolution encoder
 #define ENCODER_STEPS_PER_MENU_ITEM 1 // Set according to ENCODER_PULSES_PER_STEP or your liking
-//#define ULTIMAKERCONTROLLER //as available from the Ultimaker online store.
-//#define ULTIPANEL  //the UltiPanel as on Thingiverse
-//#define LCD_FEEDBACK_FREQUENCY_DURATION_MS 100 // the duration the buzzer plays the UI feedback sound. ie Screen Click
-//#define LCD_FEEDBACK_FREQUENCY_HZ 1000         // this is the tone frequency the buzzer plays when on UI feedback. ie Screen Click
-                                                 // 0 to disable buzzer feedback. Test with M300 S<frequency Hz> P<duration ms>
 
-// ----------------------------
-// SELECT LCD CONTROLLER HERE
-// The RepRapDiscount Smart Controller (white PCB)
-// http://reprap.org/wiki/RepRapDiscount_Smart_Controller
 
-//#define REPRAP_DISCOUNT_SMART_CONTROLLER // this is the 20 x 4 line controller
-
-// The RepRapDiscount FULL GRAPHIC Smart Controller (quadratic white PCB)
-// http://reprap.org/wiki/RepRapDiscount_Full_Graphic_Smart_Controller
-// ==> REMEMBER TO INSTALL U8glib to your ARDUINO library folder: https://github.com/olikraus/U8glib_Arduino/releases/
-
-//#define REPRAP_DISCOUNT_FULL_GRAPHIC_SMART_CONTROLLER // this is the larger LCD controller
-
- #ifdef REPRAP_DISCOUNT_FULL_GRAPHIC_SMART_CONTROLLER
-   #define DOGLCD
-   #define U8GLIB_ST7920
-   #define REPRAP_DISCOUNT_SMART_CONTROLLER
- #endif
 
 // @section extras
 

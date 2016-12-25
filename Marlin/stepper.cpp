@@ -28,9 +28,7 @@
 
 #include "language.h"
 #include "speed_lookuptable.h"
-#if defined(DIGIPOTSS_PIN) && DIGIPOTSS_PIN > -1
-#include <SPI.h>
-#endif
+
 
 //===========================================================================
 //=============================public variables  ============================
@@ -1240,26 +1238,11 @@ void babystep(const uint8_t axis,const bool direction)
 
 void digitalPotWrite(int address, int value) // From Arduino DigitalPotControl example
 {
-  #if defined(DIGIPOTSS_PIN) && DIGIPOTSS_PIN > -1
-    digitalWrite(DIGIPOTSS_PIN,LOW); // take the SS pin low to select the chip
-    SPI.transfer(address); //  send in the address and value via SPI:
-    SPI.transfer(value);
-    digitalWrite(DIGIPOTSS_PIN,HIGH); // take the SS pin high to de-select the chip:
-    //delay(10);
-  #endif
+
 }
 
 void digipot_init() //Initialize Digipot Motor Current
 {
-  #if defined(DIGIPOTSS_PIN) && DIGIPOTSS_PIN > -1
-    const uint8_t digipot_motor_current[] = DIGIPOT_MOTOR_CURRENT;
-
-    SPI.begin();
-    pinMode(DIGIPOTSS_PIN, OUTPUT);
-    for(int i=0;i<=4;i++)
-      //digitalPotWrite(digipot_ch[i], digipot_motor_current[i]);
-      digipot_current(i,digipot_motor_current[i]);
-  #endif
   #ifdef MOTOR_CURRENT_PWM_XY_PIN
     pinMode(MOTOR_CURRENT_PWM_XY_PIN, OUTPUT);
     pinMode(MOTOR_CURRENT_PWM_Z_PIN, OUTPUT);
@@ -1274,10 +1257,7 @@ void digipot_init() //Initialize Digipot Motor Current
 
 void digipot_current(uint8_t driver, int current)
 {
-  #if defined(DIGIPOTSS_PIN) && DIGIPOTSS_PIN > -1
-    const uint8_t digipot_ch[] = DIGIPOT_CHANNELS;
-    digitalPotWrite(digipot_ch[driver], current);
-  #endif
+  
   #ifdef MOTOR_CURRENT_PWM_XY_PIN
   if (driver == 0) analogWrite(MOTOR_CURRENT_PWM_XY_PIN, (long)current * 255L / (long)MOTOR_CURRENT_PWM_RANGE);
   if (driver == 1) analogWrite(MOTOR_CURRENT_PWM_Z_PIN, (long)current * 255L / (long)MOTOR_CURRENT_PWM_RANGE);
