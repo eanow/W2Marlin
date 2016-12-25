@@ -25,7 +25,7 @@
 #include "stepper.h"
 #include "planner.h"
 #include "temperature.h"
-#include "ultralcd.h"
+
 #include "language.h"
 #include "cardreader.h"
 #include "speed_lookuptable.h"
@@ -1034,7 +1034,7 @@ void st_synchronize()
     while( blocks_queued()) {
     manage_heater();
     manage_inactivity();
-    lcd_update();
+
   }
 }
 

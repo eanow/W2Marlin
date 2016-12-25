@@ -30,7 +30,7 @@
 
 
 #include "Marlin.h"
-#include "ultralcd.h"
+
 #include "temperature.h"
 #include "watchdog.h"
 
@@ -325,7 +325,7 @@ void PID_autotune(float temp, int extruder, int ncycles)
       SERIAL_PROTOCOLLNPGM("PID Autotune finished! Put the last Kp, Ki and Kd constants from above into Configuration.h");
       return;
     }
-    lcd_update();
+
   }
 }
 
@@ -1057,7 +1057,7 @@ void thermal_runaway_protection(int *state, unsigned long *timer, float temperat
           disable_e1();
           disable_e2();
           manage_heater();
-          lcd_update();
+          
         }
       }
       break;
@@ -1109,7 +1109,7 @@ void max_temp_error(uint8_t e) {
     SERIAL_ERROR_START;
     SERIAL_ERRORLN((int)e);
     SERIAL_ERRORLNPGM(": Extruder switched off. MAXTEMP triggered !");
-    LCD_ALERTMESSAGEPGM("Err: MAXTEMP");
+
   }
   #ifndef BOGUS_TEMPERATURE_FAILSAFE_OVERRIDE
   Stop();
@@ -1122,7 +1122,7 @@ void min_temp_error(uint8_t e) {
     SERIAL_ERROR_START;
     SERIAL_ERRORLN((int)e);
     SERIAL_ERRORLNPGM(": Extruder switched off. MINTEMP triggered !");
-    LCD_ALERTMESSAGEPGM("Err: MINTEMP");
+
   }
   #ifndef BOGUS_TEMPERATURE_FAILSAFE_OVERRIDE
   Stop();
@@ -1136,7 +1136,7 @@ void bed_max_temp_error(void) {
   if(IsStopped() == false) {
     SERIAL_ERROR_START;
     SERIAL_ERRORLNPGM("Temperature heated bed switched off. MAXTEMP triggered !!");
-    LCD_ALERTMESSAGEPGM("Err: MAXTEMP BED");
+
   }
   #ifndef BOGUS_TEMPERATURE_FAILSAFE_OVERRIDE
   Stop();
@@ -1528,7 +1528,7 @@ ISR(TIMER0_COMPB_vect)
         ADMUX = ((1 << REFS0) | (TEMP_0_PIN & 0x07));
         ADCSRA |= 1<<ADSC; // Start conversion
       #endif
-      lcd_buttons_update();
+
       temp_state = 1;
       break;
     case 1: // Measure TEMP_0
@@ -1550,7 +1550,7 @@ ISR(TIMER0_COMPB_vect)
         ADMUX = ((1 << REFS0) | (TEMP_BED_PIN & 0x07));
         ADCSRA |= 1<<ADSC; // Start conversion
       #endif
-      lcd_buttons_update();
+
       temp_state = 3;
       break;
     case 3: // Measure TEMP_BED
@@ -1569,7 +1569,7 @@ ISR(TIMER0_COMPB_vect)
         ADMUX = ((1 << REFS0) | (TEMP_1_PIN & 0x07));
         ADCSRA |= 1<<ADSC; // Start conversion
       #endif
-      lcd_buttons_update();
+
       temp_state = 5;
       break;
     case 5: // Measure TEMP_1
@@ -1588,7 +1588,7 @@ ISR(TIMER0_COMPB_vect)
         ADMUX = ((1 << REFS0) | (TEMP_2_PIN & 0x07));
         ADCSRA |= 1<<ADSC; // Start conversion
       #endif
-      lcd_buttons_update();
+
       temp_state = 7;
       break;
     case 7: // Measure TEMP_2
@@ -1608,7 +1608,7 @@ ISR(TIMER0_COMPB_vect)
       ADMUX = ((1 << REFS0) | (FILWIDTH_PIN & 0x07)); 
       ADCSRA |= 1<<ADSC; // Start conversion 
      #endif 
-     lcd_buttons_update();       
+
      temp_state = 9; 
      break; 
     case 9:   //Measure FILWIDTH 
