@@ -75,9 +75,9 @@ float max_e_jerk;
 float mintravelfeedrate;
 unsigned long axis_steps_per_sqr_second[NUM_AXIS];
 
-//#ifdef MJRICE_BEDLEVELING_RACK
+
 float x_right_stop_pos=X_MAX_POS;
-//#endif
+
 
 #ifdef ENABLE_AUTO_BED_LEVELING
 // this holds the required transform to compensate for bed level

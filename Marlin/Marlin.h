@@ -33,8 +33,9 @@
 #define EXTRUDE_MAXLENGTH (X_MAX_LENGTH+Y_MAX_LENGTH) //prevent extrusion of very large distances.
 
 #ifdef Z_SAFE_HOMING
- #define Z_SAFE_HOMING_X_POINT (X_MAX_LENGTH/2)    // X point for Z homing when homing all axis (G28)
- #define Z_SAFE_HOMING_Y_POINT (Y_MAX_LENGTH/2)    // Y point for Z homing when homing all axis (G28)
+//bed is 200 by 300
+ #define Z_SAFE_HOMING_X_POINT 100    // X point for Z homing when homing all axis (G28)
+ #define Z_SAFE_HOMING_Y_POINT 150    // Y point for Z homing when homing all axis (G28)
 #endif
 
 

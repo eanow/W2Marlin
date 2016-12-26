@@ -72,7 +72,6 @@ extern char msgscreen_1[20],msgscreen_2[20],msgscreen_3[20];
  * G3  - CCW ARC
  * G4  - Dwell S<seconds> or P<milliseconds>
  * G28 - Home one or more axes
- * G29 - Detailed Z probe, probes the bed at 3 or more points.  Will fail if you haven't homed yet.
  * G30 - Single Z probe, probes bed at current XY location.
  * G31 - Dock sled (Z_PROBE_SLED only)
  * G32 - Undock sled (Z_PROBE_SLED only)
@@ -178,13 +177,10 @@ float volumetric_multiplier[EXTRUDERS] = ARRAY_BY_EXTRUDERS1(1.0);
 float current_position[NUM_AXIS] = { 0.0, 0.0, 0.0, 0.0 };
 float add_homing[3]={0,0,0};
 
-
-#ifdef MJRICE_BEDLEVELING_RACK
 #define PROBE_STATE_EXTENDED 1
 #define PROBE_STATE_RETRACTED 0
 #define PROBE_STATE_UNKNOWN -1
-int Z_ProbeState = PROBE_STATE_UNKNOWN;
-#endif
+int z_probe_state = PROBE_STATE_UNKNOWN;
 
 float min_pos[3] = { X_MIN_POS, Y_MIN_POS, Z_MIN_POS };
 float max_pos[3] = { X_MAX_POS, Y_MAX_POS, Z_MAX_POS };
@@ -748,39 +744,53 @@ static void clean_up_after_endstop_move() {
 
 static void engage_z_probe() 
 {  
-   
-    #ifdef MJRICE_BEDLEVELING_RACK
-    if(Z_ProbeState != PROBE_STATE_EXTENDED) 
+    if(z_probe_state != PROBE_STATE_EXTENDED) 
     {
-      // raise the Z axis before homing X or Z
-      float x_before = current_position[X_AXIS];
-      do_blocking_move_to(0, current_position[Y_AXIS], current_position[Z_AXIS]+Z_RAISE_BEFORE_HOMING);
-      Z_ProbeState = PROBE_STATE_EXTENDED;
+      st_synchronize();
+      // raise the z axis a little bit and then move x axis all the way to the right to raise the probe
+      float x_before = current_position[X_AXIS]; 
+      float z_before = current_position[Z_AXIS];
+      if (z_before>=Z_RAISE_BEFORE_HOMING)
+      {
+        do_blocking_move_to(X_MIN_POS, current_position[Y_AXIS], current_position[Z_AXIS]);
+      }
+      else
+      {
+        do_blocking_move_to(X_MIN_POS, current_position[Y_AXIS], Z_RAISE_BEFORE_HOMING); 
+      }
+      z_probe_state = PROBE_STATE_EXTENDED;
       do_blocking_move_to(x_before, current_position[Y_AXIS], current_position[Z_AXIS]); // put X back where we found it
     }
-    #endif
 }
 
 static void retract_z_probe() 
 {
-    #ifdef MJRICE_BEDLEVELING_RACK
-    if(Z_ProbeState != PROBE_STATE_RETRACTED) 
+    if(z_probe_state != PROBE_STATE_RETRACTED) 
     {
-    st_synchronize();
-      float x_before = current_position[X_AXIS];
+      st_synchronize();
+      float x_before = current_position[X_AXIS]; 
+      float z_before = current_position[Z_AXIS];
 
-      lo_beep();
-      
       // raise the z axis a little bit and then move x axis all the way to the right to raise the probe
-      do_blocking_move_to(x_right_stop_pos, current_position[Y_AXIS], current_position[Z_AXIS]+Z_RAISE_BEFORE_PROBING);
-
-      Z_ProbeState = PROBE_STATE_RETRACTED;
+      if (z_before>=Z_RAISE_BEFORE_HOMING)
+      {
+        do_blocking_move_to(X_MAX_POS, current_position[Y_AXIS], current_position[Z_AXIS]);
+      }
+      else
+      {
+        do_blocking_move_to(X_MAX_POS, current_position[Y_AXIS], Z_RAISE_BEFORE_HOMING); 
+      }
+      
+      z_probe_state = PROBE_STATE_RETRACTED;
 
       // put X and Z back where we found them
-      do_blocking_move_to(x_before, current_position[Y_AXIS], current_position[Z_AXIS]-Z_RAISE_BEFORE_PROBING);
+      // if old X is near the X MIN, it will redeploy- so set to 0 if it's outside
+      if (x_before<0)
+      {
+        x_before=0;
+      }
+      do_blocking_move_to(x_before, current_position[Y_AXIS], z_before);
     }
-    #endif
-
 }
 
 /// Probe bed height at position (x,y), returns the measured z value
@@ -825,13 +835,23 @@ static void homeaxis(int axis)
 {
   if (axis==X_AXIS ? HOMEAXIS_DO(X) : axis==Y_AXIS ? HOMEAXIS_DO(Y) : axis==Z_AXIS ? HOMEAXIS_DO(Z) : 0) 
   {
+    if (axis==X_AXIS)
+    {
+      SERIAL_PROTOCOLPGM("Homing X Axis");  
+    }
+    if (axis==Y_AXIS)
+    {
+      SERIAL_PROTOCOLPGM("Homing Y Axis");  
+    }
+    if (axis==Z_AXIS)
+    {
+      SERIAL_PROTOCOLPGM("Homing Z Axis");  
+    }
     int axis_home_dir = home_dir(axis);
-    #ifdef MJRICE_BEDLEVELING_RACK
-    if(axis==Z_AXIS && Z_ProbeState != PROBE_STATE_EXTENDED)
+    if(axis==Z_AXIS && z_probe_state != PROBE_STATE_EXTENDED)
     {
       engage_z_probe();
     }
-    #endif
 
     current_position[axis] = 0;
     sync_plan_position();
@@ -867,10 +887,7 @@ static void homeaxis(int axis)
     endstops_hit_on_purpose();
     axis_known_position[axis] = true;
 
-
-    #ifdef MJRICE_BEDLEVELING_RACK
     if (axis==Z_AXIS) retract_z_probe();
-    #endif
 
   }
 }
@@ -894,53 +911,45 @@ void go_home()
     for(int8_t i=0; i < NUM_AXIS; i++) destination[i] = current_position[i];
     feedrate = 0.0;
 
-
-
     home_all_axis = !((code_seen(axis_codes[X_AXIS])) || (code_seen(axis_codes[Y_AXIS])) || (code_seen(axis_codes[Z_AXIS])));
-
-    #ifdef MJRICE_BEDLEVELING_RACK
-    if(!home_all_axis && code_seen(axis_codes[Z_AXIS])) {
-      home_all_axis=1; // treat "G28 Z0" like "G28" to ensure probe is in the middle of the bed like we want it
-    }
     
     // raise z axis. this movement is not done to deploy the probe, just to make sure we are high enough that it can be.
-    do_blocking_move_to(current_position[X_AXIS], current_position[Y_AXIS], current_position[Z_AXIS]+20);
+    float z_before = current_position[Z_AXIS];
+    if (z_before<Z_RAISE_BEFORE_HOMING)
+    {
+      do_blocking_move_to(current_position[X_AXIS], current_position[Y_AXIS], Z_RAISE_BEFORE_HOMING);
+    }
+    
     destination[Z_AXIS] = current_position[Z_AXIS];
-    #endif
 
     if((home_all_axis) || (code_seen(axis_codes[X_AXIS])))
     {
          homeaxis(X_AXIS);
-        #ifdef MJRICE_BEDLEVELING_RACK
          // after x has hit home, the z probe is in the extended state
-         Z_ProbeState = PROBE_STATE_EXTENDED;
-        #endif
+         z_probe_state = PROBE_STATE_EXTENDED;
     }
 
-    if((home_all_axis) || (code_seen(axis_codes[Y_AXIS]))) homeaxis(Y_AXIS); 
-
-    if(!home_all_axis) { 
-        if(code_seen(axis_codes[X_AXIS]) && (code_value_long() != 0)) current_position[X_AXIS]=code_value()+add_homing[X_AXIS];
-        if(code_seen(axis_codes[Y_AXIS]) && (code_value_long() != 0)) current_position[Y_AXIS]=code_value()+add_homing[Y_AXIS];
-    }
-
-    #ifndef Z_SAFE_HOMING
- //   #error remove this line if you meant to do this
-          if((home_all_axis) || (code_seen(axis_codes[Z_AXIS]))) {
-            #if defined (Z_RAISE_BEFORE_HOMING) && (Z_RAISE_BEFORE_HOMING > 0)
-              destination[Z_AXIS] = Z_RAISE_BEFORE_HOMING * home_dir(Z_AXIS) * (-1);    // Set destination away from bed
-              feedrate = max_feedrate[Z_AXIS];
-              plan_buffer_line(destination[X_AXIS], destination[Y_AXIS], destination[Z_AXIS], destination[E_AXIS], feedrate, active_extruder);
-              st_synchronize();
-            #endif
-            homeaxis(Z_AXIS);
-          }
-    #else                      // Z Safe mode activated.
-    if(home_all_axis) 
+    if((home_all_axis) || (code_seen(axis_codes[Y_AXIS]))) 
     {
+      homeaxis(Y_AXIS); 
+    }
+
+    // Z Safe mode activated.
+    if((home_all_axis) || (code_seen(axis_codes[Z_AXIS])))
+    {
+      //ensure X/Y axis homed
+      if (!axis_known_position[X_AXIS])
+      {
+        homeaxis(X_AXIS);
+      }
+      if (!axis_known_position[Y_AXIS])
+      {
+        homeaxis(Y_AXIS);
+      }
+
         destination[X_AXIS] = round(Z_SAFE_HOMING_X_POINT - X_PROBE_OFFSET_FROM_EXTRUDER);
         destination[Y_AXIS] = round(Z_SAFE_HOMING_Y_POINT - Y_PROBE_OFFSET_FROM_EXTRUDER);
-        destination[Z_AXIS] = Z_RAISE_BEFORE_HOMING * home_dir(Z_AXIS) * (-1);    // Set destination away from bed
+        destination[Z_AXIS] = 0;    // Set destination away from bed
         feedrate = XY_TRAVEL_SPEED / 60;
         current_position[Z_AXIS] = 0;
 
@@ -950,48 +959,10 @@ void go_home()
         current_position[X_AXIS] = destination[X_AXIS];
         current_position[Y_AXIS] = destination[Y_AXIS];
 
-        homeaxis(Z_AXIS); 
+        homeaxis(Z_AXIS);
+        current_position[Z_AXIS] += zprobe_zoffset;  //Add Z_Probe offset (the distance is negative) 
     }
 
-    // Let's see if X and Y are homed and probe is inside bed area.
-    if(code_seen(axis_codes[Z_AXIS])) 
-    { 
-             if( (axis_known_position[X_AXIS]) && (axis_known_position[Y_AXIS]) \
-                 && (current_position[X_AXIS]+X_PROBE_OFFSET_FROM_EXTRUDER >= X_MIN_POS) \
-                 && (current_position[X_AXIS]+X_PROBE_OFFSET_FROM_EXTRUDER <= X_MAX_POS) \
-                 && (current_position[Y_AXIS]+Y_PROBE_OFFSET_FROM_EXTRUDER >= Y_MIN_POS) \
-                 && (current_position[Y_AXIS]+Y_PROBE_OFFSET_FROM_EXTRUDER <= Y_MAX_POS)) 
-              {
-                current_position[Z_AXIS] = 0;
-                plan_set_position(current_position[X_AXIS], current_position[Y_AXIS], current_position[Z_AXIS], current_position[E_AXIS]);
-                destination[Z_AXIS] = Z_RAISE_BEFORE_HOMING * home_dir(Z_AXIS) * (-1);    // Set destination away from bed
-                feedrate = max_feedrate[Z_AXIS];
-                plan_buffer_line(destination[X_AXIS], destination[Y_AXIS], destination[Z_AXIS], destination[E_AXIS], feedrate, active_extruder);
-                st_synchronize();
-                homeaxis(Z_AXIS);             
-              } 
-              else if (!((axis_known_position[X_AXIS]) && (axis_known_position[Y_AXIS]))) 
-              {
-                LCD_MESSAGEPGM(MSG_POSITION_UNKNOWN);
-                SERIAL_ECHO_START;
-                SERIAL_ECHOLNPGM(MSG_POSITION_UNKNOWN);
-              } 
-              else 
-              {
-                LCD_MESSAGEPGM(MSG_ZPROBE_OUT);
-                SERIAL_ECHO_START;
-                SERIAL_ECHOLNPGM(MSG_ZPROBE_OUT);
-              }
-    }
-    #endif
-
-    if(code_seen(axis_codes[Z_AXIS]) && (code_value_long() != 0)) current_position[Z_AXIS]=code_value()+add_homing[Z_AXIS];
-
-    #ifdef ENABLE_AUTO_BED_LEVELING
-        if((home_all_axis) || (code_seen(axis_codes[Z_AXIS]))) {
-          current_position[Z_AXIS] += zprobe_zoffset;  //Add Z_Probe offset (the distance is negative)
-        }
-    #endif
     plan_set_position(current_position[X_AXIS], current_position[Y_AXIS], current_position[Z_AXIS], current_position[E_AXIS]);
 
     #ifdef ENDSTOPS_ONLY_FOR_HOMING
@@ -1221,11 +1192,6 @@ void process_commands()
     case 28: //G28 Home all Axis one at a time
     go_home();
     break;  
-
-#ifdef ENABLE_AUTO_BED_LEVELING
-    case 29: // G29 Detailed Z-Probe, probes the bed at 3 or more points.
-        z_probe_leveling();
-        break;
         
     case 30: // G30 Single Z Probe
         {
@@ -1250,7 +1216,6 @@ void process_commands()
             retract_z_probe(); // Retract Z endstop if available
         }
         break;
-#endif // ENABLE_AUTO_BED_LEVELING
 
     case 90: // G90
       relative_mode = false;
@@ -1380,7 +1345,7 @@ void process_commands()
 		SERIAL_PROTOCOLPGM("Full support at: http://3dprintboard.com/forum.php\n");
 	}
 
-	if (code_seen('n')) {
+	if (code_seen('P') || code_seen('p')) {
         	n_samples = code_value();
 		if (n_samples<4 || n_samples>50 ) {
 			SERIAL_PROTOCOLPGM("?Specified sample size not plausable.\n");

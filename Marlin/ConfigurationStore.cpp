@@ -167,6 +167,12 @@ void Config_PrintSettings()
     SERIAL_ECHOPAIR(" D" ,unscalePID_d(Kd));
     SERIAL_ECHOLN(""); 
 #endif
+    
+    SERIAL_ECHO_START;
+    SERIAL_ECHOLNPGM("Z Offset:");
+    SERIAL_ECHO_START;
+    SERIAL_ECHOPAIR("  M851 Z",-zprobe_zoffset );
+    SERIAL_ECHOLN("");
 
 }
 #endif

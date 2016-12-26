@@ -57,7 +57,7 @@ Here are some standard links for getting your machine calibrated:
 
 // This determines the communication speed of the printer
 // :[2400,9600,19200,38400,57600,115200,250000]
-#define BAUDRATE 115200//250000 //115200
+#define BAUDRATE 250000 //115200//250000 //115200
 
 // This enables the serial port associated to the Bluetooth interface
 //#define BTENABLED              // Enable BT interface on AT90USB devices
@@ -475,17 +475,12 @@ const bool Z_PROBE_ENDSTOP_INVERTING = false; // set to true to invert the logic
 
   // Offsets to the probe relative to the extruder tip (Hotend - Probe)
   // X and Y offsets must be integers
-  #ifdef MJRICE_BEDLEVELING_RACK
+
      #define X_PROBE_OFFSET_FROM_EXTRUDER 0     // Probe on: -left  +right
      #define Y_PROBE_OFFSET_FROM_EXTRUDER 45     // Probe on: -front +behind
      #define Z_PROBE_OFFSET_FROM_EXTRUDER -11  // -below (always!) 
-     #define Z_RAISE_BEFORE_HOMING 10       // (in mm) Raise Z before homing (G28) for Probe Clearance.
-  #else
-     #define X_PROBE_OFFSET_FROM_EXTRUDER -54     // Probe on: -left  +right
-     #define Y_PROBE_OFFSET_FROM_EXTRUDER -7     // Probe on: -front +behind
-     #define Z_PROBE_OFFSET_FROM_EXTRUDER -6  // -below (always!) // mrice: for wilson ts [ jhead use -18 for e3dlite use -7.7 ]
      #define Z_RAISE_BEFORE_HOMING 15       // (in mm) Raise Z before homing (G28) for Probe Clearance.
-  #endif                                      // Be sure you have this distance over your Z_MAX_POS in case
+                                // Be sure you have this distance over your Z_MAX_POS in case
 
   #define XY_TRAVEL_SPEED (100*60)         // X and Y axis travel speed between probes, in mm/min
 
@@ -500,7 +495,7 @@ const bool Z_PROBE_ENDSTOP_INVERTING = false; // set to true to invert the logic
 //If you have enabled the Bed Auto Leveling and are using the same Z Probe for Z Homing,
 //it is highly recommended you let this Z_SAFE_HOMING enabled!!!
 
-  //#define Z_SAFE_HOMING   // This feature is meant to avoid Z homing with probe outside the bed area.
+  #define Z_SAFE_HOMING   // This feature is meant to avoid Z homing with probe outside the bed area.
                           // When defined, it will:
                           // - Allow Z homing only after X and Y homing AND stepper drivers still enabled
                           // - If stepper drivers timeout, it will need X and Y homing again before Z homing
@@ -580,11 +575,9 @@ const bool Z_PROBE_ENDSTOP_INVERTING = false; // set to true to invert the logic
 // Custom M code points
 #define CUSTOM_M_CODES
 #ifdef CUSTOM_M_CODES
-  #ifdef ENABLE_AUTO_BED_LEVELING
-    #define CUSTOM_M_CODE_SET_Z_PROBE_OFFSET 851
-    #define Z_PROBE_OFFSET_RANGE_MIN -20
-    #define Z_PROBE_OFFSET_RANGE_MAX 20
-  #endif
+  #define CUSTOM_M_CODE_SET_Z_PROBE_OFFSET 851
+  #define Z_PROBE_OFFSET_RANGE_MIN -20
+  #define Z_PROBE_OFFSET_RANGE_MAX 20
 #endif
 
 // @section extras
