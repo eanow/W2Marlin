@@ -416,7 +416,7 @@
 /*************************************
  * PICA Arduino shield configuration mjrice
  ************************************* */
-#if MB(PICA) || MB(PICA_REVC)
+#if MB(PICA) || MB(PICA_REVB)
  #define KNOWN_BOARD 1
  #define LARGE_FLASH true
 
@@ -442,6 +442,9 @@
  #define E0_STEP_PIN         67 
  #define E0_DIR_PIN          24
  #define E0_ENABLE_PIN       26
+ //#define E0_STEP_PIN         68 
+ //#define E0_DIR_PIN          28
+ //#define E0_ENABLE_PIN       27
 
  #define SDPOWER            -1
  #define LED_PIN            -1 
@@ -451,16 +454,18 @@
  #define SSR_PIN            6
  #define HEATER_BED_PIN     8 // heat bed
  
-#if MB(PICA_REVC)
- #define HEATER_0_PIN       10 // extruder 
- #define HEATER_1_PIN       2 // second extruder
- #define FAN_PIN            9
- #define FAN_2_PIN          7
-#else
+#if MB(PICA_REVB) 
  #define HEATER_0_PIN       9 // extruder 
  #define HEATER_1_PIN       10 // second extruder
  #define FAN_PIN            11
  #define FAN_2_PIN          12
+#else
+ #define HEATER_0_PIN       10 // extruder 
+
+ #define HEATER_1_PIN       2 // second extruder
+
+ #define FAN_PIN            9
+ #define FAN_2_PIN          7
 #endif
 
  #define TEMP_0_PIN         9   // ANALOG NUMBERING

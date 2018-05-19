@@ -401,7 +401,7 @@ void setup()
   if(mcu & 8) SERIAL_ECHOLNPGM(MSG_WATCHDOG_RESET);
   if(mcu & 32) SERIAL_ECHOLNPGM(MSG_SOFTWARE_RESET);
   MCUSR=0;
-
+  SERIAL_PROTOCOLLNPGM("start");
   SERIAL_ECHOPGM(MSG_MARLIN);
   SERIAL_ECHOLNPGM(VERSION_STRING);
   #ifdef STRING_VERSION_CONFIG_H
@@ -837,15 +837,15 @@ static void homeaxis(int axis)
   {
     if (axis==X_AXIS)
     {
-      SERIAL_PROTOCOLPGM("Homing X Axis");  
+      SERIAL_PROTOCOLPGM("Homing X Axis\n");  
     }
     if (axis==Y_AXIS)
     {
-      SERIAL_PROTOCOLPGM("Homing Y Axis");  
+      SERIAL_PROTOCOLPGM("Homing Y Axis\n");  
     }
     if (axis==Z_AXIS)
     {
-      SERIAL_PROTOCOLPGM("Homing Z Axis");  
+      SERIAL_PROTOCOLPGM("Homing Z Axis\n");  
     }
     int axis_home_dir = home_dir(axis);
     if(axis==Z_AXIS && z_probe_state != PROBE_STATE_EXTENDED)
